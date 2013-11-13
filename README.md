@@ -1,6 +1,6 @@
 pebble-parking
 ==============
 
-Pebble watch face that includes the week of the month
+**SDK 2.0:** *This watch face requires the 2.0 beta firmware!*
 
-making an edit to test PT service hook
+Pebble watch face that includes "Nth Fribsday" for quick reference while attempting street-side parking.
