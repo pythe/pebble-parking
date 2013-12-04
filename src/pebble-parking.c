@@ -3,6 +3,7 @@
 Window *window;
 TextLayer *text_date_layer;
 TextLayer *text_time_layer;
+TextLayer *text_parking_layer;
 Layer *line_layer;
 
 void line_layer_update_callback(Layer *layer, GContext* ctx) {
@@ -40,6 +41,17 @@ void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   text_layer_set_text(text_time_layer, time_text);
 }
 
+void handle_day_tick(struct tm *tick_time, TimeUnits units_changed) {
+  static char parking_text[] = "nth Fribsday";
+
+  char *time_format;
+
+  //Determine index for nth day string
+
+
+  text_layer_set_text(text_parking_layer, parking_text);
+}
+
 void handle_deinit(void) {
   tick_timer_service_unsubscribe();
 }
@@ -63,6 +75,12 @@ void handle_init(void) {
   text_layer_set_font(text_time_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_49)));
   layer_add_child(window_layer, text_layer_get_layer(text_time_layer));
 
+  text_parking_layer = text_layer_create(GRect(9,44, 144-8, 168-44));
+  text_layer_set_color(text_parking_layer, GColorWhite);
+  text_layer_set_background_color(text_parking_layer, GColorClear);
+  text_layer_set_font(text_date_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_21)));
+  layer_add_child(window_layer, text_layer_get_layer(text_parking_layer));
+
   GRect line_frame = GRect(8, 97, 139, 2);
   line_layer = layer_create(line_frame);
   layer_set_update_proc(line_layer, line_layer_update_callback);
@@ -70,6 +88,7 @@ void handle_init(void) {
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   // TODO: Update display here to avoid blank display on launch?
+
 }
 
 
@@ -77,6 +96,6 @@ int main(void) {
   handle_init();
 
   app_event_loop();
-  
+
   handle_deinit();
 }
