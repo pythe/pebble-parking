@@ -16,3 +16,7 @@
 *.out
 *.app
 *.pbw
+
+# Build Artifacts
+.lock-waf_darwin_build
+build/
