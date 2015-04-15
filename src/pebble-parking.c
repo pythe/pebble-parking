@@ -21,7 +21,7 @@ void update_date(struct tm *tick_time) {
 
   char *day_num = "XX";
   strftime(day_num,  sizeof(day_num), "%e", tick_time);
-  int week_num = atoi(day_num)/7;
+  int week_num = atoi(day_num-1)/7;
   char *week_num_text = weeks[week_num];
 
   char *day_name = "Xxxxxxxxx";
