@@ -6,73 +6,41 @@ TextLayer *text_time_layer;
 TextLayer *text_parking_layer;
 Layer *line_layer;
 
-char *itoa(int num)
-{
-  static char buff[20] = {};
-  int i = 0, temp_num = num, length = 0;
-  char *string = buff;
-
-  if(num >= 0) {
-    // count how many characters in the number
-    while(temp_num) {
-      temp_num /= 10;
-      length++;
-    }
-
-    // assign the number to the buffer starting at the end of the 
-    // number and going to the begining since we are doing the
-    // integer to character conversion on the last number in the
-    // sequence
-    for(i = 0; i < length; i++) {
-      buff[(length-1)-i] = '0' + (num % 10);
-      num /= 10;
-    }
-    buff[i] = '\0'; // can't forget the null byte to properly end our string
-  }
-  else
-    return "Unsupported Number";
-
-  return string;
-}
+char date_text[] = "Xxxxxxxxx 00";
+char parking_text[] = "Xxxxxx Xxx";
+char* weeks[] = {NULL, NULL, NULL, NULL, NULL};
 
 void line_layer_update_callback(Layer *layer, GContext* ctx) {
   graphics_context_set_fill_color(ctx, GColorWhite);
   graphics_fill_rect(ctx, layer_get_bounds(layer), 0, GCornerNone);
 }
 
+void update_date(struct tm *tick_time) {
+  strftime(date_text, sizeof(date_text), "%B %e", tick_time);
+  text_layer_set_text(text_date_layer, date_text);
+
+  int week_num = atoi(tick_time->tm_mday-1)/7;
+  char *week_num_text = weeks[week_num];
+
+  char *day_name = "Xxxxxxxxx";
+  memset(day_name, 0, sizeof(day_name));
+  strftime(day_name, sizeof(day_name), "%a", tick_time);
+
+  memset(parking_text, 0, sizeof(parking_text));
+  strcat(parking_text, week_num_text);
+  strcat(parking_text, day_name);
+  text_layer_set_text(text_parking_layer, parking_text);
+}
+
 void handle_minute_tick(struct tm *tick_time, TimeUnits units_changed) {
   // Need to be static because they're used by the system later.
   static char time_text[] = "00:00";
-  static char date_text[] = "Xxxxxxxxx 00";
-  static char parking_text[] = "Xxxxxx Xxx";
-  static char* weeks[] = {NULL, NULL, NULL, NULL, NULL};
-  weeks[0] = "1st ";
-  weeks[1] = "2nd ";
-  weeks[2] = "3rd ";
-  weeks[3] = "4th ";
-  weeks[4] = "5th ";
 
   char *time_format;
-
-//  bool day_changed = units_changed->DAY_UNIT == 1;
-//  if (day_changed) {
-      strftime(date_text, sizeof(date_text), "%B %e", tick_time);
-      text_layer_set_text(text_date_layer, date_text);
-
-      char *day_num = "XX";
-      strftime(day_num,  sizeof(day_num), "%e", tick_time);
-      int week_num = atoi(day_num)/7;
-      char *week_num_text = weeks[week_num];
-    
-      char *day_name = "Xxxxxxxxx";
-      memset(day_name, 0, sizeof(day_name));
-      strftime(day_name, sizeof(day_name), "%a", tick_time);
-
-      memset(parking_text, 0, sizeof(parking_text));
-      strcat(parking_text, week_num_text);
-      strcat(parking_text, day_name);
-      text_layer_set_text(text_parking_layer, parking_text);
-//  }
+  bool day_changed = (units_changed & DAY_UNIT) > 0 ;
+  if (day_changed || strcmp(parking_text, "Xxxxxx Xxx") == 0) {
+      update_date(tick_time);
+  }
 
   if (clock_is_24h_style()) {
     time_format = "%R";
@@ -114,7 +82,7 @@ void handle_init(void) {
   text_layer_set_font(text_time_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_BOLD_SUBSET_49)));
   layer_add_child(window_layer, text_layer_get_layer(text_time_layer));
 
-  text_parking_layer = text_layer_create(GRect(8,38, 144-6, 168-68));
+  text_parking_layer = text_layer_create(GRect(8,46, 144-6, 168-68));
   text_layer_set_text_color(text_parking_layer, GColorWhite);
   text_layer_set_background_color(text_parking_layer, GColorClear);
   text_layer_set_font(text_parking_layer, fonts_load_custom_font(resource_get_handle(RESOURCE_ID_FONT_ROBOTO_CONDENSED_21)));
@@ -124,6 +92,13 @@ void handle_init(void) {
   line_layer = layer_create(line_frame);
   layer_set_update_proc(line_layer, line_layer_update_callback);
   layer_add_child(window_layer, line_layer);
+
+
+  weeks[0] = "1st ";
+  weeks[1] = "2nd ";
+  weeks[2] = "3rd ";
+  weeks[3] = "4th ";
+  weeks[4] = "5th ";
 
   tick_timer_service_subscribe(MINUTE_UNIT, handle_minute_tick);
   // TODO: Update display here to avoid blank display on launch?
