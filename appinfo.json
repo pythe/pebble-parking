@@ -4,7 +4,7 @@
   "longName": "Parking",
   "companyName": "Dungeoneer",
   "versionCode": 1,
-  "versionLabel": "1.1",
+  "versionLabel": "1.2",
   "watchapp": {
     "watchface": true
   },
@@ -41,3 +41,4 @@
   ],
   "sdkVersion": "3"
 }
+
