@@ -1,4 +1,3 @@
-
 {
   "uuid": "5BD41303-E68E-4620-A28C-09B94BD859E3",
   "shortName": "Parking",
@@ -35,5 +34,10 @@
         "file": "fonts/Roboto-Bold.ttf"
       }
     ]
-  }
+  },
+  "targetPlatforms": [
+    "aplite",
+    "basalt"
+  ],
+  "sdkVersion": "3"
 }

@@ -19,7 +19,7 @@ void update_date(struct tm *tick_time) {
   strftime(date_text, sizeof(date_text), "%B %e", tick_time);
   text_layer_set_text(text_date_layer, date_text);
 
-  int week_num = atoi(tick_time->tm_mday-1)/7;
+  int week_num = (tick_time->tm_mday-1)/7;
   char *week_num_text = weeks[week_num];
 
   char *day_name = "Xxxxxxxxx";
